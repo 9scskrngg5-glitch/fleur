@@ -236,7 +236,7 @@
 <!-- ECRAN 3 : LETTRE + MUSIQUE -->
 <div id="lettre" class="screen">
   <div id="lettre-contenu">
-    <p id="texte-lettre">Hola mi amor, sé que no estas en tu mejor mood, por eso queria hacerte sonreir y recordate cuanto te amo. Eres une novia increible, que no cambiaria por nada del mundo. abrirme al mundo me hace darme cuenta de lo afortunado que soy de ternerte a mi lado, y pronto voy a estar cerca de ti. No puedo esperar  a pasar tiempo contigo y tu familia, pero antes que nada, tu cumpleaños, tus 18años, y despues de eso, tal vez verte aqui explorando tahiti y borabora con Paulina. tengo muchas ganas de ver nuestro futuro juntos. Por favor mi amor, haz cosas que te gusten y no te deprimas, aunque sé que la lluvia no ayuda pero voy a jugar contigo jeje. te amo mi amor.</p>
+    <p id="texte-lettre">Hola mi amor, sé que no estas en tu mejor mood, por eso queria hacerte sonreir y recordate cuanto te amo. Eres une novia increible, que no cambiaria por nada del mundo. abrir[...]
     <div class="signature">Gilles</div>
   </div>
   <div id="music-indicator">🎵 lecture en cours...</div>
@@ -262,12 +262,30 @@
     if (input === '240925') {
       showScreen('lettre');
       lancerPetales();
+      
+      // Démarrer la musique avec gestion du autoplay bloqué
       const audio = document.getElementById('audio-player');
-      audio.play().catch(() => {
-        document.getElementById('music-indicator').textContent =
-          '🎵 clique n\'importe où pour lancer la musique';
-        document.body.addEventListener('click', () => audio.play(), { once: true });
-      });
+      const musicIndicator = document.getElementById('music-indicator');
+      
+      const playAudio = () => {
+        audio.play()
+          .then(() => {
+            musicIndicator.textContent = '🎵 musique en cours...';
+          })
+          .catch((err) => {
+            console.log('Autoplay bloqué, attente interaction utilisateur');
+            musicIndicator.textContent = '🎵 clique n\'importe où pour lancer la musique';
+            // Attendre un clic pour lancer la musique
+            document.addEventListener('click', () => {
+              audio.play();
+              musicIndicator.textContent = '🎵 musique en cours...';
+            }, { once: true });
+          });
+      };
+      
+      // Essayer de lancer après un léger délai pour s'assurer que le DOM est prêt
+      setTimeout(playAudio, 100);
+      
     } else {
       errorMsg.textContent = 'Mot de passe incorrect, réessaie 💗';
       document.getElementById('password-input').value = '';
